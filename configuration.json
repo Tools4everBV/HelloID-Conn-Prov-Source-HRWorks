@@ -1,0 +1,35 @@
+[
+  {
+    "key": "apiurl",
+    "type": "input",
+    "defaultValue": "https://api-demo.hrworks.de/v2",
+    "templateOptions": {
+      "label": "Api URL",
+      "placeholder": "Enter the Api URL",
+      "description": "",
+      "required": true
+    }
+  },
+  {
+    "key": "clientid",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "label": "Access Key",
+      "placeholder": "Enter the Access Key",
+      "description": "",
+      "required": true
+    }
+  },
+  {
+    "key": "clientsecret",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "label": "Secret Access Key",
+      "placeholder": "Enter the Secret Access Key",
+      "type": "password",
+      "required": true
+    }
+  }
+]

@@ -17,10 +17,23 @@ $authorization = [ordered]@{
     'Content-Type' = "application/json";
     Accept = "application/json";
 }
-$response = Invoke-RestMethod -Method GET -Uri "$($c.apiurl)/persons/master-data" -Headers $authorization
+$response = Invoke-WebRequest -Method GET -Uri "$($c.apiurl)/persons/master-data" -Headers $authorization
+$persons = ($response.content | ConvertFrom-Json).persons
 
+foreach ($header in $response.Headers.Link.split(",")) {
+    if ($header -match '<(.*)>; rel="last"') {
+        $url = $matches[1] 
+        $null = $url -match '.*page=(.*)'
+        $pagecount = $matches[1]
+        for ($i=2; $i -le $pagecount; $i++)
+        {
+            $response = Invoke-WebRequest -Method GET -Uri "$($c.apiurl)/persons/master-data/?page=$i" -Headers $authorization
+            $persons += ($response.content | ConvertFrom-Json).persons
+        }
+    }
+} 
 $departments  = [System.Collections.ArrayList]@();
-foreach ($employee in $response.persons)
+foreach ($employee in $persons)
 {
     $department  = @{};
     $department['ExternalId'] = $employee.organizationUnit.number

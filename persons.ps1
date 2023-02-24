@@ -20,14 +20,18 @@ $authorization = [ordered]@{
 $response = Invoke-WebRequest -Method GET -Uri "$($c.apiurl)/persons/master-data" -Headers $authorization
 $persons = ($response.content | ConvertFrom-Json).persons
 
-while (![string]::IsNullOrEmpty($response.Headers.Link)) {
-    foreach ($header in $response.Headers.Link.split(",")) {
-        if ($header -match '<(.*)>; rel="(.*)"') {                
-            $response = Invoke-WebRequest -Method GET -Uri $matches[1] -Headers $authorization
-            foreach ($person in ($response.content | ConvertFrom-Json).persons) { $null = $persons.Add($person) }
+foreach ($header in $response.Headers.Link.split(",")) {
+    if ($header -match '<(.*)>; rel="last"') {
+        $url = $matches[1] 
+        $null = $url -match '.*page=(.*)'
+        $pagecount = $matches[1]
+        for ($i=2; $i -le $pagecount; $i++)
+        {
+            $response = Invoke-WebRequest -Method GET -Uri "$($c.apiurl)/persons/master-data/?page=$i" -Headers $authorization
+            $persons += ($response.content | ConvertFrom-Json).persons
         }
     }
-}
+} 
 foreach ($employee in $persons)
 {
     $person  = @{};
